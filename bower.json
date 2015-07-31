@@ -1,0 +1,18 @@
+{
+  "name": "threejs-code-only",
+  "version": "r71",
+  "homepage": "https://github.com/01alchemist/three.js-code-only",
+  "description": "Three.js code only repo including example js files",
+  "main": "three.js",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "three.js",
+    "threejs-code-only"
+  ],
+  "authors": [
+    "Nidin Vinayakan"
+  ],
+  "license": "MIT"
+}
