@@ -147,7 +147,6 @@ THREE.ShaderDeferred = {
 			"uniform float wrapAround;",
 			"uniform float additiveSpecular;",
 
-			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "color_pars_fragment" ],
 			THREE.ShaderChunk[ "map_pars_fragment" ],
 			THREE.ShaderChunk[ "lightmap_pars_fragment" ],
@@ -187,16 +186,13 @@ THREE.ShaderDeferred = {
 
 				"const float opacity = 1.0;",
 
-				"vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
-				"vec4 diffuseColor = vec4( diffuse, opacity );",
+				"gl_FragColor = vec4( diffuse, opacity );",
 
 				THREE.ShaderChunk[ "map_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
 				THREE.ShaderChunk[ "lightmap_fragment" ],
 				THREE.ShaderChunk[ "color_fragment" ],
-
-				"outgoingLight = diffuseColor.rgb;",
 
 				"#ifdef USE_ENVMAP",
 
@@ -229,19 +225,23 @@ THREE.ShaderDeferred = {
 
 					"#endif",
 
-					"cubeColor.xyz = inputToLinear( cubeColor.xyz );",
+					"#ifdef GAMMA_INPUT",
+
+						"cubeColor.xyz *= cubeColor.xyz;",
+
+					"#endif",
 
 					"if ( combine == 1 ) {",
 
-						"outgoingLight = mix( outgoingLight, cubeColor.xyz, specularStrength * reflectivity );",
+						"gl_FragColor.xyz = mix( gl_FragColor.xyz, cubeColor.xyz, specularStrength * reflectivity );",
 
 					"} else if ( combine == 2 ) {",
 
-						"outgoingLight += cubeColor.xyz * specularStrength * reflectivity;",
+						"gl_FragColor.xyz += cubeColor.xyz * specularStrength * reflectivity;",
 
 					"} else {",
 
-						"outgoingLight = mix( outgoingLight, diffuseColor.xyz * cubeColor.xyz, specularStrength * reflectivity );",
+						"gl_FragColor.xyz = mix( gl_FragColor.xyz, gl_FragColor.xyz * cubeColor.xyz, specularStrength * reflectivity );",
 
 					"}",
 
@@ -270,7 +270,7 @@ THREE.ShaderDeferred = {
 
 				// diffuse color
 
-				"gl_FragColor.x = vec3_to_float( compressionScale * outgoingLight );",
+				"gl_FragColor.x = vec3_to_float( compressionScale * gl_FragColor.xyz );",
 
 				// specular color
 
@@ -308,7 +308,6 @@ THREE.ShaderDeferred = {
 
 		vertexShader : [
 
-			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "map_pars_vertex" ],
 			THREE.ShaderChunk[ "lightmap_pars_vertex" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
